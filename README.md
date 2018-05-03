@@ -27,7 +27,7 @@ d|during|inside|onto|outside|under|underneath|upon|with|without|through
 
 - To the left of the colon is the name of the rule
 
--To the right of the colon is the rule definition which can consist of words, keywords
+- To the right of the colon is the rule definition which can consist of words, keywords
 and references to other rules.
 
 - A reference to another rule is marked with angle brackets, for example &lt;NOUN&gt;.

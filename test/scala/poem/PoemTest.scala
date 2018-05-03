@@ -1,10 +1,9 @@
-package util
+package poem
 
 import org.junit.Assert.{assertEquals, assertTrue}
 import org.junit.Test
-import poem.PoemRule
 
-class RulesUtilTest {
+class PoemTest {
   private val validRules = List(
     "TEST: blahblah",
     "THIS: that|other",
@@ -18,7 +17,7 @@ class RulesUtilTest {
     "PREPOSITION: above|across|against|along|among|around|before|behind|beneath|beside|between|beyond|during|inside|onto|outside|under|underneath|upon|with|without|through <NOUN>|<PRONOUN>|<ADJECTIVE>")
 
   @Test
-  def parseRules_emptyLines_returnsEmpty(): Unit = assertTrue(RulesUtil.parseRules(List()).isEmpty)
+  def parseRules_emptyLines_returnsEmpty(): Unit = assertTrue(Poem.parseRules(List()).isEmpty)
 
   @Test
   def parseRules_someLinesInvalid_returnsRulesForGoodLines(): Unit = {
@@ -27,13 +26,13 @@ class RulesUtilTest {
     val invalidRule3 = "PRONOUN: my|your|his|her <NOUN>||<ADJECTIVE>"
     val invalidRule4 = "PRONOUN: my|your|his|her <NOUN>|<ADJECTIVE>&BAD&"
     val invalidRule5 = "PRONOUN: "
-    assertEquals(validRules.map(PoemRule.create), RulesUtil.parseRules(validRules ::: List(invalidRule1, invalidRule2, invalidRule3, invalidRule4, invalidRule5)))
+    assertEquals(validRules.map(PoemRule.create), Poem.parseRules(validRules ::: List(invalidRule1, invalidRule2, invalidRule3, invalidRule4, invalidRule5)))
   }
 
   @Test
   def parseRules_allLinesValid_returnsRules(): Unit = {
     val expectedRules = validRules.map(PoemRule.create)
-    val actualRules = RulesUtil.parseRules(validRules)
+    val actualRules = Poem.parseRules(validRules)
     assertEquals(expectedRules, actualRules)
     assertEquals(validRules.size, actualRules.size)
   }

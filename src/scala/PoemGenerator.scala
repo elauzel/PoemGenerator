@@ -1,10 +1,9 @@
 import poem.Poem
-import util.{FileUtil, RulesUtil}
+import util.FileUtil
 
 object PoemGenerator {
   def main(args: Array[String]): Unit = {
     val lines = FileUtil.readResource("rules.txt")
-    val rules = RulesUtil.parseRules(lines)
-    val poem = Poem.build(rules)
+    val poem = Poem.buildFromText(lines)
   }
 }

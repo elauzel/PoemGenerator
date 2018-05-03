@@ -12,6 +12,6 @@ object RulesUtil {
   def parseRules(lines: List[String]): List[PoemRule] = {
     val badLines = lines.filter(l => l.isEmpty || (!l.matches(PoemRuleRegex1) && !l.matches(PoemRuleRegex2) && !l.matches(PoemRuleRegex3)))
     badLines.foreach(l => LoggerUtil.logError("Bad Rule from source file: " + l))
-    lines.diff(badLines).map(PoemRule)
+    lines.diff(badLines).map(PoemRule.create)
   }
 }

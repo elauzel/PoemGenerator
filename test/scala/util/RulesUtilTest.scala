@@ -31,5 +31,10 @@ class RulesUtilTest {
   }
 
   @Test
-  def parseRules_allLinesValid_returnsRules(): Unit = assertEquals(validRules.map(PoemRule.create), RulesUtil.parseRules(validRules))
+  def parseRules_allLinesValid_returnsRules(): Unit = {
+    val expectedRules = validRules.map(PoemRule.create)
+    val actualRules = RulesUtil.parseRules(validRules)
+    assertEquals(expectedRules, actualRules)
+    assertEquals(validRules.size, actualRules.size)
+  }
 }

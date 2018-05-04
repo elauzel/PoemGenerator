@@ -1,9 +1,10 @@
 package poem
 
+import common.AbstractTestBase
 import org.junit.Assert.{assertEquals, assertTrue}
-import org.junit.{Assert, Test}
+import org.junit.Test
 
-class PoemRuleTest {
+class PoemRuleTest extends AbstractTestBase {
   @Test
   def create_invalidText_throwsException(): Unit = {
     assertThrows[RuntimeException](() => PoemRule.create(""))
@@ -20,14 +21,5 @@ class PoemRuleTest {
     val rule = PoemRule.create("name: part1a|part1b part2 <part3> $part4")
     assertTrue(rule.ruleName == "name")
     assertEquals(List("part1a|part1b", "part2", "<part3>", "$part4"), rule.ruleParts)
-  }
-
-  private def assertThrows[T <: Throwable](func: () => Any): Unit = {
-    try {
-      func()
-      Assert.fail()
-    } catch {
-      case _: T =>
-    }
   }
 }

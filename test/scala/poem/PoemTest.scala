@@ -1,9 +1,12 @@
 package poem
 
+import common.AbstractTestBase
 import org.junit.Assert.{assertEquals, assertTrue}
 import org.junit.Test
+import scala.collection.immutable.Map
 
-class PoemTest {
+class PoemTest extends AbstractTestBase {
+  private val NEWLINE = System.lineSeparator()
   private val validRules = List(
     "TEST: blahblah",
     "THIS: that|other",
@@ -35,5 +38,46 @@ class PoemTest {
     val actualRules = Poem.parseRules(validRules)
     assertEquals(expectedRules, actualRules)
     assertEquals(validRules.size, actualRules.size)
+  }
+
+  @Test
+  def unpackTopLevelRule_justWords_returnsPoem(): Unit = {
+    val rule = PoemRule("Poem", List("just", "plain", "words"))
+    assertEquals("just plain words", Poem.unpackTopLevelRule(rule, Map.empty))
+  }
+
+  @Test
+  def unpackTopLevelRule_wordsWithChoices_returnsPoem(): Unit = {
+    val rule = PoemRule("Poem", List("I|You", "love", "cake|fruit"))
+    val actual = Poem.unpackTopLevelRule(rule, Map.empty)
+    assertTrue(List("I love cake", "I love fruit", "You love cake", "You love fruit").contains(actual))
+  }
+
+  @Test
+  def unpackTopLevelRule_wordsWithLinebreak_returnsPoem(): Unit = {
+    val rule = PoemRule("Poem", List("one", "$LINEBREAK", "two"))
+    val actual = Poem.unpackTopLevelRule(rule, Map.empty)
+    assertEquals("one" + NEWLINE + "two", actual)
+  }
+
+  @Test
+  def unpackTopLevelRule_wordsWithEnd_returnsPoem(): Unit = {
+    val rule = PoemRule("Poem", List("one", "two", "$END", "three"))
+    val actual = Poem.unpackTopLevelRule(rule, Map.empty)
+    assertEquals("one two", actual)
+  }
+
+  @Test
+  def unpackTopLevelRule_wordsWithReference_missingRule_throwsException(): Unit = {
+    val rule = PoemRule("Poem", List("I", "jumped", "<PREPOSITION>", "everything"))
+    assertThrows[RuntimeException](() => Poem.unpackTopLevelRule(rule, Map.empty))
+  }
+
+  @Test
+  def unpackTopLevelRule_wordsWithReference_ruleInMap_returnsPoem(): Unit = {
+    val rule = PoemRule("Poem", List("I", "jumped", "<PREPOSITION>", "everything"))
+    val prepRule = Poem.parseRules(List("PREPOSITION: above|across|against|along|among|around|before|behind|beneath|beside|between|beyond|during|inside|onto|outside|under|underneath")).head
+    val actual = Poem.unpackTopLevelRule(rule, Map("PREPOSITION" -> prepRule))
+    assertTrue(actual.matches("I jumped [a-z]+ everything"))
   }
 }

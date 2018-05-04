@@ -3,7 +3,6 @@ package poem
 import common.AbstractTestBase
 import org.junit.Assert.{assertEquals, assertTrue}
 import org.junit.Test
-import scala.collection.immutable.Map
 
 class PoemTest extends AbstractTestBase {
   private val NEWLINE = System.lineSeparator()
@@ -41,43 +40,24 @@ class PoemTest extends AbstractTestBase {
   }
 
   @Test
-  def unpackTopLevelRule_justWords_returnsPoem(): Unit = {
-    val rule = PoemRule("Poem", List("just", "plain", "words"))
-    assertEquals("just plain words", Poem.unpackTopLevelRule(rule, Map.empty))
-  }
+  def buildFromText_justWords_returnsPoem(): Unit = assertEquals("just plain words", Poem.buildFromText(List("POEM: just plain words")))
 
   @Test
-  def unpackTopLevelRule_wordsWithChoices_returnsPoem(): Unit = {
-    val rule = PoemRule("Poem", List("I|You", "love", "cake|fruit"))
-    val actual = Poem.unpackTopLevelRule(rule, Map.empty)
-    assertTrue(List("I love cake", "I love fruit", "You love cake", "You love fruit").contains(actual))
-  }
+  def buildFromText_wordsWithChoices_returnsPoem(): Unit =
+    assertTrue(List("I love cake", "I love fruit", "You love cake", "You love fruit").contains(Poem.buildFromText(List("POEM: I|You love cake|fruit"))))
 
   @Test
-  def unpackTopLevelRule_wordsWithLinebreak_returnsPoem(): Unit = {
-    val rule = PoemRule("Poem", List("one", "$LINEBREAK", "two"))
-    val actual = Poem.unpackTopLevelRule(rule, Map.empty)
-    assertEquals("one" + NEWLINE + "two", actual)
-  }
+  def buildFromText_wordsWithLinebreak_returnsPoem(): Unit = assertEquals("one" + NEWLINE + "two", Poem.buildFromText(List("POEM: one $LINEBREAK two")))
 
   @Test
-  def unpackTopLevelRule_wordsWithEnd_returnsPoem(): Unit = {
-    val rule = PoemRule("Poem", List("one", "two", "$END", "three"))
-    val actual = Poem.unpackTopLevelRule(rule, Map.empty)
-    assertEquals("one two", actual)
-  }
+  def buildFromText_wordsWithEnd_returnsPoem(): Unit = assertEquals("one two", Poem.buildFromText(List("POEM: one two $END three")))
 
   @Test
-  def unpackTopLevelRule_wordsWithReference_missingRule_throwsException(): Unit = {
-    val rule = PoemRule("Poem", List("I", "jumped", "<PREPOSITION>", "everything"))
-    assertThrows[RuntimeException](() => Poem.unpackTopLevelRule(rule, Map.empty))
-  }
+  def buildFromText_wordsWithReference_missingRule_throwsException(): Unit = assertThrows[RuntimeException](() => Poem.buildFromText(List("POEM: I jumped <PREPOSITION> everything")))
 
   @Test
-  def unpackTopLevelRule_wordsWithReference_ruleInMap_returnsPoem(): Unit = {
-    val rule = PoemRule("Poem", List("I", "jumped", "<PREPOSITION>", "everything"))
-    val prepRule = Poem.parseRules(List("PREPOSITION: above|across|against|along|among|around|before|behind|beneath|beside|between|beyond|during|inside|onto|outside|under|underneath")).head
-    val actual = Poem.unpackTopLevelRule(rule, Map("PREPOSITION" -> prepRule))
-    assertTrue(actual.matches("I jumped [a-z]+ everything"))
+  def buildFromText_wordsWithReference_ruleInMap_returnsPoem(): Unit = {
+    val rules = List("POEM: I jumped <PREPOSITION> everything $LINEBREAK EVERYTHING", "PREPOSITION: above|across|against|along|among|around|before|behind|beneath|beside|between|beyond")
+    assertTrue(Poem.buildFromText(rules).matches("I jumped [a-z]+ everything" + NEWLINE + "EVERYTHING"))
   }
 }
